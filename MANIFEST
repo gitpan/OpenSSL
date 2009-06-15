@@ -6,12 +6,10 @@ MANIFEST
 README
 OpenSSL/Digest.pm
 OpenSSL/Cipher.pm
-OpenSSL/Name.pm
 OpenSSL/PKCS12.pm
 OpenSSL/PKCS7.pm
 OpenSSL/RSA.pm
 OpenSSL/Rand.pm
-OpenSSL/X509.pm
 OpenSSL/CRL.pm
 OpenSSL/BN.pm
 OpenSSL/HMAC.pm
@@ -22,6 +20,5 @@ t/03_Cipher.t
 t/04_CipherAll.t
 t/05_HMAC.t
 t/06_RSA.t
-t/07_Name.t
-t/08_X509.t
-t/09_BN.t
+t/07_BN.t
+META.yml                                 Module meta-data (added by MakeMaker)

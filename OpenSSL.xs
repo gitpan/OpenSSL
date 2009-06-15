@@ -255,7 +255,7 @@ static inline SV* base64sv(unsigned char *s, unsigned len)
 #define FLAG_BASE64 0x20
 #define NO_FLAGS(x) ((x) &0xf)
 
-static EVP_MD *_mds[8];
+static const EVP_MD *_mds[10];
 
 static int mds_booted = 0;
 
@@ -279,7 +279,7 @@ static void mds_boot (void)
 
 
 static char *
-dofp(X509 *x509, EVP_MD *digest)
+dofp(X509 *x509, const EVP_MD *digest)
 {
    	unsigned char md[EVP_MAX_MD_SIZE];
    	unsigned static char s[EVP_MAX_MD_SIZE*3];
@@ -321,7 +321,7 @@ static bool is_privkey(RSA *key)
 }
 
 typedef struct {
-  EVP_CIPHER *func;
+  const EVP_CIPHER *func;
   char name[20];
 } cip_list_st;
 
@@ -339,7 +339,7 @@ static inline char *wappla_fixname(const char *s)
 	return x;
 }
 
-static inline EVP_CIPHER *lookup_cipher(const char *name)
+static inline const EVP_CIPHER *lookup_cipher(const char *name)
 {
 	int i;
         for(i = 0; i < cip_cnt;i++)
@@ -348,7 +348,7 @@ static inline EVP_CIPHER *lookup_cipher(const char *name)
         return 0;
 }
 
-#define ADD_C_(x) cip_list[cip_cnt].func =  (EVP_##x()); \
+#define ADD_C_(x) cip_list[cip_cnt].func =  ( EVP_##x()); \
 		strcpy(cip_list[cip_cnt++].name, wappla_fixname(#x))
 
 static int cipher_booted = 0;
@@ -658,7 +658,7 @@ public_encrypt(key, sv)
    private_decrypt = 3
    decrypt = 7
    PREINIT:
-   static int (*func[4])(int, unsigned char *, unsigned char *, RSA *, int) = { RSA_public_encrypt, RSA_public_decrypt, RSA_private_encrypt, RSA_private_decrypt };
+   static int (*func[4])(int, const unsigned char *, unsigned char *, RSA *, int) = { RSA_public_encrypt, RSA_public_decrypt, RSA_private_encrypt, RSA_private_decrypt };
    STRLEN len;
    int keylen;
    char *p;
@@ -930,7 +930,7 @@ fingerprint_md5(x509)
    	fingerprint_md2 = 1
         fingerprint_sha1 = 2
    PREINIT:
-   	EVP_MD *mds[] = { EVP_md5(), EVP_md2(), EVP_sha1() };
+   	const EVP_MD *mds[] = { EVP_md5(), EVP_md2(), EVP_sha1() };
    CODE:                     
    	RETVAL = dofp(x509, mds[ix]);
    OUTPUT:
@@ -1106,7 +1106,7 @@ new_decrypt(...)
   PREINIT:
   	char *name;
         SV *svkey;
-  	EVP_CIPHER *ci;
+  	const EVP_CIPHER *ci;
 	char *key;
         char iv[EVP_MAX_IV_LENGTH];
         char k[EVP_MAX_KEY_LENGTH];
@@ -1215,8 +1215,7 @@ md2(...)
         sha1 =      0x4
         dss =       0x5
         dss1 =      0x6
-        mdc2 =      0x7
-        ripemd160 = 0x8
+        ripemd160 = 0x7
 	md2_hex =   0x10
   	md4_hex =   0x11
         md5_hex =   0x12
@@ -1224,8 +1223,7 @@ md2(...)
         sha1_hex =  0x14
         dss_hex =   0x15
         dss1_hex =  0x16
-        mdc2_hex =  0x17
-        ripemd160_hex = 0x18
+        ripemd160_hex = 0x17
 	md2_base64 = 0x20
   	md4_base64 = 0x21
         md5_base64 = 0x22
@@ -1233,8 +1231,7 @@ md2(...)
         sha1_base64 = 0x24
         dss_base64 = 0x25
         dss1_base64 = 0x26
-        mdc2_base64 = 0x27
-        ripemd160_base64 = 0x28
+        ripemd160_base64 = 0x27
      CODE:
   	EVP_MD_CTX ctx;
 	STRLEN l;
@@ -1352,8 +1349,7 @@ md2(svkey, sv)
         sha1 =      0x4
         dss =       0x5
         dss1 =      0x6
-        mdc2 =      0x7
-        ripemd160 = 0x8
+        ripemd160 = 0x7
 	md2_hex =   0x10
   	md4_hex =   0x11
         md5_hex =   0x12
@@ -1361,8 +1357,7 @@ md2(svkey, sv)
         sha1_hex =  0x14
         dss_hex =   0x15
         dss1_hex =  0x16
-        mdc2_hex =  0x17
-        ripemd160_hex = 0x18
+        ripemd160_hex = 0x17
 	md2_base64 = 0x20
   	md4_base64 = 0x21
         md5_base64 = 0x22
@@ -1370,8 +1365,7 @@ md2(svkey, sv)
         sha1_base64 = 0x24
         dss_base64 = 0x25
         dss1_base64 = 0x26
-        mdc2_base64 = 0x27
-        ripemd160_base64 = 0x28
+        ripemd160_base64 = 0x27
   PREINIT:
 	STRLEN l, keylen;
         char *p;
@@ -1407,8 +1401,7 @@ new_md2()
         new_sha1 = 0x4
         new_dss = 0x5
         new_dss1 = 0x6
-        new_mdc2 = 0x7
-        new_ripemd160 = 0x8
+        new_ripemd160 = 0x7
    CODE:
    	RETVAL = (EVP_MD_CTX *) malloc(sizeof(EVP_MD_CTX));
 	if(!RETVAL)
